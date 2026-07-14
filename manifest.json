@@ -1,0 +1,16 @@
+{
+  "name": "Scripture Quest — Bible Journey",
+  "short_name": "Scripture Quest",
+  "description": "Offline-first Bible RPG study companion — read, memorize, journal, and grow.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F3E9D2",
+  "theme_color": "#B8862F",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
