@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scripture Quest — Your Bible Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --ink:#1B2A4A;
+  --ink-soft:#33456b;
+  --parchment:#F3E9D2;
+  --parchment-soft:#EADFC2;
+  --gold:#B8862F;
+  --gold-light:#D9AF60;
+  --ember:#A63D2F;
+  --sage:#5C7A5E;
+  --paper-line: rgba(27,42,74,0.12);
+  --shadow: 0 8px 24px rgba(27,42,74,0.14);
+  --radius: 14px;
+  --font-display:'Fraunces', serif;
+  --font-body:'Inter', sans-serif;
+  --font-scroll:'IM Fell English', serif;
+
+  --bg: var(--parchment);
+  --bg-soft: var(--parchment-soft);
+  --surface: #FFFDF7;
+  --text: var(--ink);
+  --text-soft: #5b6785;
+  --accent: var(--gold);
+  --accent-2: var(--ember);
+  --line: var(--paper-line);
+}
+
+[data-theme="night"]{
+  --bg:#10182B;
+  --bg-soft:#182444;
+  --surface:#182444;
+  --text:#EDE6D6;
+  --text-soft:#a6b0d1;
+  --accent: var(--gold-light);
+  --accent-2:#d97a63;
+  --line: rgba(237,230,214,0.14);
+}
+[data-theme="sunrise"]{
+  --bg:#FFF3E4;
+  --bg-soft:#FFE3C7;
+  --surface:#FFFAF2;
+  --text:#5A2E17;
+  --text-soft:#8a5a3a;
+  --accent:#E08A2C;
+  --accent-2:#C4482E;
+  --line: rgba(90,46,23,0.14);
+}
+[data-theme="scroll"]{
+  --bg:#EFE3C3;
+  --bg-soft:#E4D3A4;
+  --surface:#F7EED4;
+  --text:#3B2E1A;
+  --text-soft:#7a6a44;
+  --accent:#8C6A2C;
+  --accent-2:#7A3B26;
+  --line: rgba(59,46,26,0.18);
+}
+[data-theme="nature"]{
+  --bg:#EEF3E6;
+  --bg-soft:#DCE9CE;
+  --surface:#FBFDF7;
+  --text:#243B26;
+  --text-soft:#5a7a5c;
+  --accent:#5C7A5E;
+  --accent-2:#A6763E;
+  --line: rgba(36,59,38,0.14);
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  transition:background .4s ease, color .4s ease;
+  padding-bottom:84px;
+  min-height:100vh;
+}
+@media(prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+
+a{color:inherit;}
+button{font-family:var(--font-body); cursor:pointer; border:none; background:none; color:inherit;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--line); border-radius:8px;}
+
+/* ============ HEADER ============ */
+header.top{
+  position:sticky; top:0; z-index:30;
+  background:var(--bg); border-bottom:1px solid var(--line);
+  padding:14px 18px;
+  display:flex; align-items:center; justify-content:space-between;
+  backdrop-filter:blur(6px);
+}
+.brand{display:flex; align-items:center; gap:10px;}
+.brand .mark{
+  width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, var(--gold-light), var(--accent) 65%, var(--accent-2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display); font-weight:700; color:#fff; font-size:16px;
+  box-shadow:0 2px 6px rgba(0,0,0,.25);
+}
+.brand h1{font-family:var(--font-display); font-size:19px; font-weight:700; letter-spacing:.2px;}
+.header-stats{display:flex; align-items:center; gap:14px;}
+.streak-chip{
+  display:flex; align-items:center; gap:5px; font-weight:600; font-size:13.5px;
+  background:var(--bg-soft); padding:6px 10px; border-radius:20px;
+}
+.level-chip{
+  display:flex; flex-direction:column; align-items:flex-end; font-size:11px; color:var(--text-soft);
+}
+.level-chip b{font-family:var(--font-display); font-size:14px; color:var(--text); font-weight:700;}
+.xp-mini{
+  width:110px; height:8px; border-radius:6px; background:var(--bg-soft); overflow:hidden; margin-top:3px;
+  border:1px solid var(--line);
+}
+.xp-mini > div{height:100%; background:linear-gradient(90deg, var(--accent), var(--gold-light)); border-radius:6px; transition:width .6s cubic-bezier(.4,1.4,.6,1);}
+
+/* ============ NAV ============ */
+nav.tabs{
+  display:flex; gap:4px; overflow-x:auto; padding:10px 12px; background:var(--bg-soft);
+  border-bottom:1px solid var(--line); position:sticky; top:61px; z-index:29;
+  scrollbar-width:none;
+}
+nav.tabs::-webkit-scrollbar{display:none;}
+nav.tabs button{
+  flex:0 0 auto; padding:8px 14px; border-radius:999px; font-size:13px; font-weight:600;
+  color:var(--text-soft); white-space:nowrap; transition:all .2s;
+}
+nav.tabs button.active{background:var(--accent); color:#fff; box-shadow:0 3px 8px rgba(0,0,0,.15);}
+
+main{max-width:760px; margin:0 auto; padding:18px 16px 40px;}
+.card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:18px; margin-bottom:16px; box-shadow:var(--shadow);
+}
+.card h2{font-family:var(--font-display); font-size:20px; margin-bottom:10px; font-weight:700;}
+.card h3{font-family:var(--font-display); font-size:16px; margin-bottom:6px; font-weight:600;}
+.muted{color:var(--text-soft); font-size:13.5px;}
+.pill{display:inline-block; padding:3px 10px; border-radius:999px; font-size:11.5px; font-weight:700; background:var(--bg-soft); color:var(--text-soft); text-transform:uppercase; letter-spacing:.4px;}
+.btn{
+  display:inline-flex; align-items:center; gap:6px; padding:10px 16px; border-radius:10px;
+  background:var(--accent); color:#fff; font-weight:700; font-size:13.5px; transition:transform .15s, box-shadow .15s;
+  box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
+.btn:hover{transform:translateY(-1px);}
+.btn.secondary{background:var(--bg-soft); color:var(--text);}
+.btn.ghost{background:transparent; border:1px solid var(--line); color:var(--text); box-shadow:none;}
+.btn.small{padding:6px 12px; font-size:12px;}
+.row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+.grid{display:grid; gap:12px;}
+.grid.cols-2{grid-template-columns:1fr 1fr;}
+@media(max-width:520px){.grid.cols-2{grid-template-columns:1fr;}}
+
+/* ============ TOAST / XP POP ============ */
+#toastLayer{position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:8px; align-items:center;}
+.toast{
+  background:var(--ink); color:#fff; padding:10px 18px; border-radius:999px; font-weight:700; font-size:13.5px;
+  box-shadow:0 6px 20px rgba(0,0,0,.3); animation:popIn .35s ease, fadeOut .4s ease 1.8s forwards;
+  display:flex; align-items:center; gap:8px;
+}
+@keyframes popIn{from{transform:translateY(-14px) scale(.9); opacity:0;} to{transform:translateY(0) scale(1); opacity:1;}}
+@keyframes fadeOut{to{opacity:0; transform:translateY(-8px);}}
+
+/* ============ READER ============ */
+.reader-controls{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+select{
+  padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--text); font-family:var(--font-body); font-size:13.5px;
+}
+.chapter-text{font-family:var(--font-scroll); font-size:19px; line-height:1.85;}
+.verse{padding:4px 6px; border-radius:6px; cursor:pointer; transition:background .15s; position:relative;}
+.verse:hover{background:var(--bg-soft);}
+.verse.hl-important{background:rgba(184,134,47,.22);}
+.verse.hl-promise{background:rgba(92,122,94,.22);}
+.verse.hl-warning{background:rgba(166,61,47,.2);}
+.verse.hl-command{background:rgba(27,42,74,.14);}
+.verse.hl-encouragement{background:rgba(217,175,96,.28);}
+.verse.hl-reflection{background:rgba(140,106,44,.2);}
+.vnum{font-family:var(--font-body); font-weight:700; font-size:11px; color:var(--accent); vertical-align:super; margin-right:3px;}
+.dropcap::first-letter{font-family:var(--font-display); font-size:2.6em; float:left; line-height:.8; padding-right:8px; padding-top:4px; color:var(--accent); font-weight:700;}
+
+.verse-menu{
+  position:fixed; z-index:100; background:var(--surface); border:1px solid var(--line); border-radius:10px;
+  box-shadow:var(--shadow); padding:8px; display:none; flex-direction:column; min-width:190px;
+}
+.verse-menu button{padding:8px 10px; text-align:left; border-radius:6px; font-size:13px;}
+.verse-menu button:hover{background:var(--bg-soft);}
+.verse-menu .hl-row{display:flex; gap:6px; padding:6px; flex-wrap:wrap;}
+.swatch{width:22px; height:22px; border-radius:50%; border:2px solid var(--line);}
+
+/* ============ PROGRESS DASH ============ */
+.stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; text-align:center;}
+.stat-box{background:var(--bg-soft); border-radius:10px; padding:12px 6px;}
+.stat-box b{display:block; font-family:var(--font-display); font-size:22px;}
+.stat-box span{font-size:11px; color:var(--text-soft);}
+
+/* mission checklist */
+.mission{display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid var(--line);}
+.mission:last-child{border-bottom:none;}
+.mission .check{
+  width:24px; height:24px; border-radius:7px; border:2px solid var(--accent); flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center; font-size:14px; transition:all .2s;
+}
+.mission.done .check{background:var(--accent); color:#fff;}
+.mission.done .label{text-decoration:line-through; color:var(--text-soft);}
+.mission .xp{margin-left:auto; font-size:12px; font-weight:700; color:var(--accent);}
+
+/* achievements */
+.ach-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:12px;}
+.ach{text-align:center; padding:10px 6px; border-radius:10px; background:var(--bg-soft); opacity:.35; filter:grayscale(1);}
+.ach.unlocked{opacity:1; filter:none; box-shadow:0 3px 10px rgba(184,134,47,.25);}
+.ach .icon{font-size:26px; display:block; margin-bottom:4px;}
+.ach .name{font-size:11px; font-weight:600; line-height:1.3;}
+
+/* journal */
+textarea{
+  width:100%; min-height:110px; padding:10px; border-radius:10px; border:1px solid var(--line);
+  background:var(--surface); color:var(--text); font-family:var(--font-body); font-size:14px; resize:vertical;
+}
+.entry{border-bottom:1px solid var(--line); padding:12px 0;}
+.entry:last-child{border-bottom:none;}
+.entry .meta{font-size:11.5px; color:var(--text-soft); margin-bottom:4px;}
+
+/* quiz */
+.quiz-opt{display:block; width:100%; text-align:left; padding:12px; border-radius:10px; border:1px solid var(--line); margin-bottom:8px; background:var(--surface); font-size:14px;}
+.quiz-opt:hover{border-color:var(--accent);}
+.quiz-opt.correct{background:rgba(92,122,94,.25); border-color:var(--sage);}
+.quiz-opt.wrong{background:rgba(166,61,47,.2); border-color:var(--ember);}
+
+/* challenges */
+.challenge{border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:12px;}
+.progress-bar{height:9px; border-radius:6px; background:var(--bg-soft); overflow:hidden; margin:8px 0; border:1px solid var(--line);}
+.progress-bar > div{height:100%; background:linear-gradient(90deg, var(--sage), var(--accent)); border-radius:6px; transition:width .5s;}
+
+/* character db */
+.char-card{border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:12px; cursor:pointer;}
+.char-card h3{display:flex; align-items:center; gap:8px;}
+.char-detail{display:none; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); font-size:13.5px; line-height:1.6;}
+.char-card.open .char-detail{display:block;}
+
+/* timeline */
+.timeline{position:relative; padding-left:26px;}
+.timeline::before{content:''; position:absolute; left:8px; top:6px; bottom:6px; width:2px; background:var(--line);}
+.tl-item{position:relative; padding-bottom:22px;}
+.tl-item::before{content:''; position:absolute; left:-26px; top:3px; width:14px; height:14px; border-radius:50%; background:var(--accent); border:3px solid var(--surface); box-shadow:0 0 0 2px var(--accent);}
+.tl-item b{font-family:var(--font-display); font-size:15px;}
+
+/* focus mode */
+.focus-overlay{
+  position:fixed; inset:0; background:var(--ink); color:#EDE6D6; z-index:300; display:none;
+  flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px;
+}
+.focus-overlay.active{display:flex;}
+.focus-timer{font-family:var(--font-display); font-size:64px; font-weight:700; margin:20px 0;}
+.focus-verse{max-width:480px; font-family:var(--font-scroll); font-size:20px; line-height:1.7; margin-bottom:24px; color:var(--gold-light);}
+
+/* theme picker */
+.theme-swatch{display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; padding:8px; border-radius:10px; border:2px solid transparent;}
+.theme-swatch.active{border-color:var(--accent);}
+.theme-preview{width:52px; height:52px; border-radius:50%; box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.theme-preview.parchment{background:linear-gradient(135deg,#F3E9D2,#B8862F);}
+.theme-preview.night{background:linear-gradient(135deg,#10182B,#D9AF60);}
+.theme-preview.sunrise{background:linear-gradient(135deg,#FFE3C7,#E08A2C);}
+.theme-preview.scroll{background:linear-gradient(135deg,#EFE3C3,#8C6A2C);}
+.theme-preview.nature{background:linear-gradient(135deg,#DCE9CE,#5C7A5E);}
+
+/* bottom nav (mobile) */
+.hint{font-size:12px; color:var(--text-soft); margin-top:6px;}
+.empty{text-align:center; padding:30px 10px; color:var(--text-soft);}
+.adventure-box{text-align:center; padding:10px;}
+.adventure-box .glyph{font-size:40px; margin-bottom:6px;}
+input[type="text"]{padding:9px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--text); font-family:var(--font-body); font-size:13.5px; width:100%;}
+</style>
+</head>
+<body data-theme="parchment">
+
+<div id="toastLayer"></div>
+
+<header class="top">
+  <div class="brand">
+    <div class="mark">✦</div>
+    <h1>Scripture Quest</h1>
+  </div>
+  <div class="header-stats">
+    <div class="streak-chip">🔥 <span id="streakVal">0</span></div>
+    <div class="level-chip">
+      <b id="levelTitle">Scripture Beginner</b>
+      <div class="xp-mini"><div id="xpMiniBar" style="width:0%"></div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="home" class="active">🏠 Today</button>
+  <button data-tab="read">📖 Read</button>
+  <button data-tab="study">🧭 Study Modes</button>
+  <button data-tab="journal">✍️ Journal</button>
+  <button data-tab="quiz">❓ Quiz</button>
+  <button data-tab="challenges">🏁 Challenges</button>
+  <button data-tab="characters">👤 Characters</button>
+  <button data-tab="timeline">🕰️ Timeline</button>
+  <button data-tab="achievements">🏆 Achievements</button>
+  <button data-tab="settings">⚙️ Settings</button>
+</nav>
+
+<main>
+
+  <!-- ============ HOME / TODAY ============ -->
+  <section id="tab-home" class="tabpanel">
+    <div class="card" id="homeReviewCard" style="display:none;">
+      <span class="pill">Spaced Repetition</span>
+      <h2 style="margin-top:8px;">🔁 <span id="homeReviewCount">0</span> verses due for review</h2>
+      <p class="muted">A quick check-in keeps memorized verses from fading.</p>
+      <button class="btn small" style="margin-top:8px;" onclick="document.querySelector('[data-tab=study]').click()">Go to Review Queue</button>
+    </div>
+    <div class="card">
+      <span class="pill">Today's Mission</span>
+      <h2 style="margin-top:8px;">Daily Quest</h2>
+      <div id="missionList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Your Progress</h2>
+      <div class="stat-grid">
+        <div class="stat-box"><b id="statXP">0</b><span>Total XP</span></div>
+        <div class="stat-box"><b id="statStreak">0</b><span>Day Streak</span></div>
+        <div class="stat-box"><b id="statLongest">0</b><span>Longest Streak</span></div>
+        <div class="stat-box"><b id="statChapters">0</b><span>Chapters Read</span></div>
+        <div class="stat-box"><b id="statVerses">0</b><span>Verses Saved</span></div>
+        <div class="stat-box"><b id="statEntries">0</b><span>Journal Entries</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>What Should I Study Today?</h2>
+      <p class="muted">Tap for a random adventure — a topic, a reading, and a question to sit with.</p>
+      <div class="adventure-box" id="adventureBox">
+        <button class="btn" id="adventureBtn" style="margin-top:8px;">🎲 Surprise Me</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Focus Mode</h2>
+      <p class="muted">A quiet timer to read without distraction.</p>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn secondary small" onclick="startFocus(5)">5 min</button>
+        <button class="btn secondary small" onclick="startFocus(15)">15 min</button>
+        <button class="btn secondary small" onclick="startFocus(30)">30 min</button>
+        <button class="btn ghost small" onclick="startFocusCustom()">Custom…</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ READ ============ -->
+  <section id="tab-read" class="tabpanel" style="display:none;">
+    <div class="card">
+      <div class="reader-controls">
+        <select id="bookSelect"></select>
+        <select id="chapterSelect"></select>
+        <input type="text" id="searchBox" placeholder="Search verses…" style="flex:1; min-width:140px;">
+      </div>
+      <div id="searchResults"></div>
+      <div id="readerHeader"></div>
+      <div class="chapter-text dropcap" id="chapterText"></div>
+      <div class="row" style="margin-top:16px;">
+        <button class="btn" id="markReadBtn">✓ Mark Chapter Read (+15 XP)</button>
+        <button class="btn ghost" id="copyChapterBtn">📋 Copy Chapter</button>
+      </div>
+      <p class="hint">Tap any verse to highlight, bookmark, add a note, or copy/share it.</p>
+    </div>
+  </section>
+
+  <!-- ============ STUDY MODES ============ -->
+  <section id="tab-study" class="tabpanel" style="display:none;">
+    <div class="card">
+      <h2>🔁 Review Queue</h2>
+      <p class="muted">Spaced repetition: verses you've memorized resurface at Day 3, Day 7, and Day 30 so they stick for good.</p>
+      <div id="reviewQueueHost" style="margin-top:12px;"></div>
+    </div>
+    <div class="card">
+      <h2>Choose a Study Mode</h2>
+      <div class="grid cols-2" style="margin-top:10px;">
+        <div class="card" style="margin:0;"><h3>⚡ Quick Reading</h3><p class="muted">Just the text — simple and fast.</p><button class="btn small secondary" onclick="setStudyMode('quick')">Use Mode</button></div>
+        <div class="card" style="margin:0;"><h3>🔍 Deep Study</h3><p class="muted">Context, meaning, cross‑references, reflection.</p><button class="btn small secondary" onclick="setStudyMode('deep')">Use Mode</button></div>
+        <div class="card" style="margin:0;"><h3>🕊️ Devotional</h3><p class="muted">Verse, thought, application, prayer.</p><button class="btn small secondary" onclick="setStudyMode('devotional')">Use Mode</button></div>
+        <div class="card" style="margin:0;"><h3>🧠 Memory Mode</h3><p class="muted">Flashcards and missing‑word practice.</p><button class="btn small secondary" onclick="setStudyMode('memory')">Use Mode</button></div>
+      </div>
+    </div>
+    <div class="card" id="studyModeOutput"><p class="muted">Select a study mode above, then pick a verse from the Read tab to study it in that mode. Your most recently tapped verse will appear here.</p></div>
+  </section>
+
+  <!-- ============ JOURNAL ============ -->
+  <section id="tab-journal" class="tabpanel" style="display:none;">
+    <div class="card">
+      <h2>New Entry</h2>
+      <select id="entryType" style="margin-bottom:8px;">
+        <option value="reflection">Daily Reflection</option>
+        <option value="prayer">Prayer</option>
+        <option value="lesson">Lesson Learned</option>
+        <option value="question">Question</option>
+        <option value="application">Personal Application</option>
+      </select>
+      <textarea id="entryText" placeholder="Write what's on your heart…"></textarea>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn" id="saveEntryBtn">Save Entry (+10 XP)</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <h2>Your Journal</h2>
+        <button class="btn ghost small" id="exportJournalBtn">Export</button>
+      </div>
+      <input type="text" id="journalSearch" placeholder="Search your entries…" style="margin:10px 0;">
+      <div id="journalList"></div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="tab-quiz" class="tabpanel" style="display:none;">
+    <div class="card">
+      <h2>Bible Quiz</h2>
+      <div class="row">
+        <select id="quizDifficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <button class="btn" id="startQuizBtn">Start Quiz</button>
+      </div>
+      <p class="muted" style="margin-top:8px;">Score: <span id="quizScore">0</span> / <span id="quizTotal">0</span></p>
+    </div>
+    <div class="card" id="quizArea" style="display:none;"></div>
+  </section>
+
+  <!-- ============ CHALLENGES ============ -->
+  <section id="tab-challenges" class="tabpanel" style="display:none;">
+    <div class="card"><h2>Bible Challenges</h2><p class="muted">Start a program and track your progress day by day.</p></div>
+    <div id="challengeList"></div>
+  </section>
+
+  <!-- ============ CHARACTERS ============ -->
+  <section id="tab-characters" class="tabpanel" style="display:none;">
+    <div class="card"><h2>Bible Character Encyclopedia</h2></div>
+    <div id="charList"></div>
+  </section>
+
+  <!-- ============ TIMELINE ============ -->
+  <section id="tab-timeline" class="tabpanel" style="display:none;">
+    <div class="card">
+      <h2>Bible Timeline</h2>
+      <div class="timeline" id="timelineList"></div>
+    </div>
+  </section>
+
+  <!-- ============ ACHIEVEMENTS ============ -->
+  <section id="tab-achievements" class="tabpanel" style="display:none;">
+    <div class="card">
+      <h2>Achievements</h2>
+      <div class="ach-grid" id="achGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section id="tab-settings" class="tabpanel" style="display:none;">
+    <div class="card">
+      <h2>Theme</h2>
+      <div class="row" id="themeRow"></div>
+    </div>
+    <div class="card">
+      <h2>Data</h2>
+      <p class="muted">All your progress is stored privately in this browser only (LocalStorage). Nothing is uploaded anywhere.</p>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn ghost" id="exportDataBtn">Export All Data</button>
+        <button class="btn ghost" style="color:var(--ember);" id="resetDataBtn">Reset All Progress</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>📚 Bible Library</h2>
+      <p class="muted">A small starter set (Genesis 1, Psalms 1/23/46, Proverbs 3, Matthew 5, John 3, Romans 8, 1 Corinthians 13, Philippians 4) is bundled so the app works instantly with zero setup. Every other chapter downloads once from a free public‑domain KJV source, then stays cached on this device — no internet needed after that.</p>
+      <div class="stat-grid" style="margin:12px 0;">
+        <div class="stat-box"><b id="libCachedCount">0</b><span>Chapters Downloaded</span></div>
+        <div class="stat-box"><b id="libTotalCount">1189</b><span>Total Chapters</span></div>
+        <div class="stat-box"><b id="libSizeKB">0</b><span>MB Used</span></div>
+      </div>
+      <div class="progress-bar"><div id="libProgressBar" style="width:0%"></div></div>
+      <p class="muted" id="libStatus">Not downloading.</p>
+      <div class="row" style="margin-top:10px;">
+        <select id="libScopeSelect">
+          <option value="all">Whole Bible (66 books)</option>
+          <option value="OT">Old Testament only</option>
+          <option value="NT">New Testament only</option>
+          <option value="book" id="libScopeBookOpt">Current book only</option>
+        </select>
+        <button class="btn small" id="libDownloadBtn">⬇️ Download</button>
+        <button class="btn small ghost" id="libPauseBtn" style="display:none;">⏸ Pause</button>
+        <button class="btn small ghost" style="color:var(--ember);" id="libClearBtn">🗑 Clear Cached Chapters</button>
+      </div>
+      <p class="hint">Downloads respect the source's rate limit (~1 chapter every 2 seconds) so a full Bible takes roughly 40 minutes over Wi‑Fi. You can close this tab and resume later — already-downloaded chapters are never re-fetched. Offline storage is capped around 35MB; if you download more than that, the oldest chapters you haven't reread are quietly dropped to make room — nothing ever errors out.</p>
+    </div>
+  </section>
+
+</main>
+
+<div class="verse-menu" id="verseMenu"></div>
+
+<div class="focus-overlay" id="focusOverlay">
+  <div class="pill" style="background:rgba(217,175,96,.2); color:#D9AF60;">Focus Mode</div>
+  <div class="focus-timer" id="focusTimerDisplay">05:00</div>
+  <div class="focus-verse" id="focusVerseText">"Be still, and know that I am God." — Psalm 46:10</div>
+  <button class="btn secondary" id="exitFocusBtn">End Session</button>
+</div>
+
+<script>
+/* =========================================================
+   SCRIPTURE QUEST — offline gamified Bible study app
+   Single-file, LocalStorage-only, no external runtime deps
+   (Google Fonts is the only network call, purely cosmetic —
+   the app is fully functional without it.)
+========================================================= */
+
+/* ---------- SAMPLE BIBLE DATA (public-domain KJV) ----------
+   Structure: BIBLE[book][chapterNumber] = [ "v1 text", "v2 text", ... ]
+   This is a starter subset chosen to make every feature usable
+   offline. Extend it with the rest of the KJV to unlock all 66 books. */
+const BIBLE = {
+  "Genesis": {
+    1: [
+      "In the beginning God created the heaven and the earth.",
+      "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters.",
+      "And God said, Let there be light: and there was light.",
+      "And God saw the light, that it was good: and God divided the light from the darkness.",
+      "And God called the light Day, and the darkness he called Night. And the evening and the morning were the first day."
+    ]
+  },
+  "Psalms": {
+    1: [
+      "Blessed is the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinners, nor sitteth in the seat of the scornful.",
+      "But his delight is in the law of the LORD; and in his law doth he meditate day and night.",
+      "And he shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season; his leaf also shall not wither; and whatsoever he doeth shall prosper."
+    ],
+    23: [
+      "The LORD is my shepherd; I shall not want.",
+      "He maketh me to lie down in green pastures: he leadeth me beside the still waters.",
+      "He restoreth my soul: he leadeth me in the paths of righteousness for his name's sake.",
+      "Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me; thy rod and thy staff they comfort me.",
+      "Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over.",
+      "Surely goodness and mercy shall follow me all the days of my life: and I will dwell in the house of the LORD for ever."
+    ],
+    46: [
+      "God is our refuge and strength, a very present help in trouble.",
+      "Therefore will not we fear, though the earth be removed, and though the mountains be carried into the midst of the sea;",
+      "Be still, and know that I am God: I will be exalted among the heathen, I will be exalted in the earth."
+    ]
+  },
+  "Proverbs": {
+    3: [
+      "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
+      "In all thy ways acknowledge him, and he shall direct thy paths.",
+      "Be not wise in thine own eyes: fear the LORD, and depart from evil."
+    ]
+  },
+  "Matthew": {
+    5: [
+      "Blessed are the poor in spirit: for theirs is the kingdom of heaven.",
+      "Blessed are they that mourn: for they shall be comforted.",
+      "Blessed are the meek: for they shall inherit the earth.",
+      "Blessed are they which do hunger and thirst after righteousness: for they shall be filled.",
+      "Blessed are the merciful: for they shall obtain mercy.",
+      "Blessed are the pure in heart: for they shall see God.",
+      "Blessed are the peacemakers: for they shall be called the children of God."
+    ]
+  },
+  "John": {
+    3: [
+      "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",
+      "For God sent not his Son into the world to condemn the world; but that the world through him might be saved."
+    ]
+  },
+  "Romans": {
+    8: [
+      "And we know that all things work together for good to them that love God, to them who are the called according to his purpose.",
+      "What shall we then say to these things? If God be for us, who can be against us?"
+    ]
+  },
+  "1 Corinthians": {
+    13: [
+      "Charity suffereth long, and is kind; charity envieth not; charity vaunteth not itself, is not puffed up,",
+      "Doth not behave itself unseemly, seeketh not her own, is not easily provoked, thinketh no evil;",
+      "Beareth all things, believeth all things, hopeth all things, endureth all things.",
+      "Charity never faileth."
+    ]
+  },
+  "Philippians": {
+    4: [
+      "Rejoice in the Lord alway: and again I say, Rejoice.",
+      "Let your moderation be known unto all men. The Lord is at hand.",
+      "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.",
+      "I can do all things through Christ which strengtheneth me."
+    ]
+  }
+};
+
+/* ---------- FULL BIBLE LIBRARY (all 66 books, metadata) ----------
+   The BIBLE object above is a small bundled starter set so the app
+   works the instant it's opened with zero setup. Every other chapter
+   is fetched once (when online) from bible-api.com — a free public-
+   domain KJV source — and then cached forever in localStorage, so
+   after the first read it keeps working fully offline. See the
+   "Bible Library" card in Settings to bulk-download books/testaments
+   ahead of time (e.g. before a trip with no signal). */
+const BOOK_META = [
+  {name:"Genesis",testament:"OT",category:"Law",chapters:50},
+  {name:"Exodus",testament:"OT",category:"Law",chapters:40},
+  {name:"Leviticus",testament:"OT",category:"Law",chapters:27},
+  {name:"Numbers",testament:"OT",category:"Law",chapters:36},
+  {name:"Deuteronomy",testament:"OT",category:"Law",chapters:34},
+  {name:"Joshua",testament:"OT",category:"History",chapters:24},
+  {name:"Judges",testament:"OT",category:"History",chapters:21},
+  {name:"Ruth",testament:"OT",category:"History",chapters:4},
+  {name:"1 Samuel",testament:"OT",category:"History",chapters:31},
+  {name:"2 Samuel",testament:"OT",category:"History",chapters:24},
+  {name:"1 Kings",testament:"OT",category:"History",chapters:22},
+  {name:"2 Kings",testament:"OT",category:"History",chapters:25},
+  {name:"1 Chronicles",testament:"OT",category:"History",chapters:29},
+  {name:"2 Chronicles",testament:"OT",category:"History",chapters:36},
+  {name:"Ezra",testament:"OT",category:"History",chapters:10},
+  {name:"Nehemiah",testament:"OT",category:"History",chapters:13},
+  {name:"Esther",testament:"OT",category:"History",chapters:10},
+  {name:"Job",testament:"OT",category:"Wisdom",chapters:42},
+  {name:"Psalms",testament:"OT",category:"Wisdom",chapters:150},
+  {name:"Proverbs",testament:"OT",category:"Wisdom",chapters:31},
+  {name:"Ecclesiastes",testament:"OT",category:"Wisdom",chapters:12},
+  {name:"Song of Solomon",testament:"OT",category:"Wisdom",chapters:8},
+  {name:"Isaiah",testament:"OT",category:"Major Prophets",chapters:66},
+  {name:"Jeremiah",testament:"OT",category:"Major Prophets",chapters:52},
+  {name:"Lamentations",testament:"OT",category:"Major Prophets",chapters:5},
+  {name:"Ezekiel",testament:"OT",category:"Major Prophets",chapters:48},
+  {name:"Daniel",testament:"OT",category:"Major Prophets",chapters:12},
+  {name:"Hosea",testament:"OT",category:"Minor Prophets",chapters:14},
+  {name:"Joel",testament:"OT",category:"Minor Prophets",chapters:3},
+  {name:"Amos",testament:"OT",category:"Minor Prophets",chapters:9},
+  {name:"Obadiah",testament:"OT",category:"Minor Prophets",chapters:1},
+  {name:"Jonah",testament:"OT",category:"Minor Prophets",chapters:4},
+  {name:"Micah",testament:"OT",category:"Minor Prophets",chapters:7},
+  {name:"Nahum",testament:"OT",category:"Minor Prophets",chapters:3},
+  {name:"Habakkuk",testament:"OT",category:"Minor Prophets",chapters:3},
+  {name:"Zephaniah",testament:"OT",category:"Minor Prophets",chapters:3},
+  {name:"Haggai",testament:"OT",category:"Minor Prophets",chapters:2},
+  {name:"Zechariah",testament:"OT",category:"Minor Prophets",chapters:14},
+  {name:"Malachi",testament:"OT",category:"Minor Prophets",chapters:4},
+  {name:"Matthew",testament:"NT",category:"Gospels",chapters:28},
+  {name:"Mark",testament:"NT",category:"Gospels",chapters:16},
+  {name:"Luke",testament:"NT",category:"Gospels",chapters:24},
+  {name:"John",testament:"NT",category:"Gospels",chapters:21},
+  {name:"Acts",testament:"NT",category:"History",chapters:28},
+  {name:"Romans",testament:"NT",category:"Letters",chapters:16},
+  {name:"1 Corinthians",testament:"NT",category:"Letters",chapters:16},
+  {name:"2 Corinthians",testament:"NT",category:"Letters",chapters:13},
+  {name:"Galatians",testament:"NT",category:"Letters",chapters:6},
+  {name:"Ephesians",testament:"NT",category:"Letters",chapters:6},
+  {name:"Philippians",testament:"NT",category:"Letters",chapters:4},
+  {name:"Colossians",testament:"NT",category:"Letters",chapters:4},
+  {name:"1 Thessalonians",testament:"NT",category:"Letters",chapters:5},
+  {name:"2 Thessalonians",testament:"NT",category:"Letters",chapters:3},
+  {name:"1 Timothy",testament:"NT",category:"Letters",chapters:6},
+  {name:"2 Timothy",testament:"NT",category:"Letters",chapters:4},
+  {name:"Titus",testament:"NT",category:"Letters",chapters:3},
+  {name:"Philemon",testament:"NT",category:"Letters",chapters:1},
+  {name:"Hebrews",testament:"NT",category:"Letters",chapters:13},
+  {name:"James",testament:"NT",category:"Letters",chapters:5},
+  {name:"1 Peter",testament:"NT",category:"Letters",chapters:5},
+  {name:"2 Peter",testament:"NT",category:"Letters",chapters:3},
+  {name:"1 John",testament:"NT",category:"Letters",chapters:5},
+  {name:"2 John",testament:"NT",category:"Letters",chapters:1},
+  {name:"3 John",testament:"NT",category:"Letters",chapters:1},
+  {name:"Jude",testament:"NT",category:"Letters",chapters:1},
+  {name:"Revelation",testament:"NT",category:"Prophecy",chapters:22}
+];
+const BOOK_CHAPTERS = Object.fromEntries(BOOK_META.map(b=>[b.name,b.chapters]));
+
+/* ---------- OFFLINE CACHE LAYER (IndexedDB, ~35MB budget, LRU eviction) ----------
+   localStorage caps out at ~5-10MB per site, which is why the old
+   version hit "storage full" almost immediately. IndexedDB has no such
+   tiny limit, so downloaded chapters are stored there instead. A soft
+   budget (MAX_CACHE_BYTES) keeps things reasonable on low-RAM devices;
+   once it's reached, the least-recently-read downloaded chapters are
+   quietly evicted to make room for new ones instead of erroring out. */
+const CACHE_DB_NAME = 'bibleQuestCache';
+const CACHE_STORE = 'chapters';
+const MAX_CACHE_BYTES = 35 * 1024 * 1024; // ~35MB budget for downloaded chapters
+
+let cacheDBPromise = null;
+function openCacheDB(){
+  if(cacheDBPromise) return cacheDBPromise;
+  cacheDBPromise = new Promise((resolve,reject)=>{
+    if(!('indexedDB' in window)){ reject(new Error('no indexedDB')); return; }
+    const req = indexedDB.open(CACHE_DB_NAME, 1);
+    req.onupgradeneeded = ()=>{
+      const db = req.result;
+      if(!db.objectStoreNames.contains(CACHE_STORE)) db.createObjectStore(CACHE_STORE, {keyPath:'key'});
+    };
+    req.onsuccess = ()=>resolve(req.result);
+    req.onerror = ()=>reject(req.error);
+  });
+  return cacheDBPromise;
+}
+function idbPut(record){
+  return openCacheDB().then(db=>new Promise((resolve,reject)=>{
+    const tx = db.transaction(CACHE_STORE,'readwrite');
+    tx.objectStore(CACHE_STORE).put(record);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = ()=>reject(tx.error);
+  }));
+}
+function idbDelete(key){
+  return openCacheDB().then(db=>new Promise((resolve,reject)=>{
+    const tx = db.transaction(CACHE_STORE,'readwrite');
+    tx.objectStore(CACHE_STORE).delete(key);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = ()=>reject(tx.error);
+  }));
+}
+function idbGetAll(){
+  return openCacheDB().then(db=>new Promise((resolve,reject)=>{
+    const tx = db.transaction(CACHE_STORE,'readonly');
+    const req = tx.objectStore(CACHE_STORE).getAll();
+    req.onsuccess = ()=>resolve(req.result||[]);
+    req.onerror = ()=>reject(req.error);
+  }));
+}
+function idbClearAll(){
+  return openCacheDB().then(db=>new Promise((resolve,reject)=>{
+    const tx = db.transaction(CACHE_STORE,'readwrite');
+    tx.objectStore(CACHE_STORE).clear();
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = ()=>reject(tx.error);
+  }));
+}
+
+// In-memory mirror of what's on disk. BIBLE itself stays the single
+// source of truth that the (synchronous) render code reads from, so
+// nothing else in the app needs to change or become async.
+const cacheIndex = new Map(); // "book_chap" -> {bytes, ts}
+let cacheTotalBytes = 0;
+const STARTER_KEYS = new Set();
+Object.keys(BIBLE).forEach(book=>{
+  Object.keys(BIBLE[book]).forEach(chap=>STARTER_KEYS.add(book+'_'+chap));
+});
+
+function cacheKey(book,chap){ return book + '_' + chap; }
+
+function getCachedChapter(book,chap){
+  if(BIBLE[book] && BIBLE[book][chap]) return BIBLE[book][chap];
+  return null;
+}
+
+function removeCachedEntry(key){
+  const meta = cacheIndex.get(key);
+  if(!meta) return;
+  cacheIndex.delete(key);
+  cacheTotalBytes -= meta.bytes;
+  idbDelete(key).catch(()=>{});
+  const idx = key.lastIndexOf('_');
+  const book = key.slice(0,idx), chap = Number(key.slice(idx+1));
+  if(BIBLE[book] && !STARTER_KEYS.has(key)) delete BIBLE[book][chap];
+}
+
+function evictUntilFits(incomingBytes, incomingKey){
+  if(cacheTotalBytes + incomingBytes <= MAX_CACHE_BYTES) return;
+  const oldestFirst = [...cacheIndex.entries()]
+    .filter(([k])=>k!==incomingKey)
+    .sort((a,b)=>a[1].ts-b[1].ts);
+  for(const [k] of oldestFirst){
+    if(cacheTotalBytes + incomingBytes <= MAX_CACHE_BYTES) break;
+    removeCachedEntry(k);
+  }
+}
+
+function storeCachedChapter(book,chap,verses){
+  if(!BIBLE[book]) BIBLE[book] = {};
+  BIBLE[book][chap] = verses;
+  const key = cacheKey(book,chap);
+  const bytes = JSON.stringify(verses).length;
+  evictUntilFits(bytes, key);
+  const ts = Date.now();
+  cacheIndex.set(key, {bytes, ts});
+  cacheTotalBytes += bytes;
+  idbPut({key, book, chap, verses, bytes, ts})
+    .catch(()=>{ toast('Could not save that chapter for offline use','⚠️'); });
+}
+function cachedChapterCount(){
+  return cacheIndex.size;
+}
+function cacheSizeKB(){
+  return Math.round(cacheTotalBytes/1024);
+}
+function cacheSizeMB(){
+  return (cacheTotalBytes/(1024*1024)).toFixed(1);
+}
+function clearBibleCache(){
+  [...cacheIndex.keys()].forEach(k=>removeCachedEntry(k));
+  idbClearAll().catch(()=>{});
+}
+function loadCacheFromDisk(){
+  return idbGetAll().then(records=>{
+    records.forEach(rec=>{
+      if(!BIBLE[rec.book]) BIBLE[rec.book] = {};
+      BIBLE[rec.book][rec.chap] = rec.verses;
+      cacheIndex.set(rec.key, {bytes: rec.bytes, ts: rec.ts});
+      cacheTotalBytes += rec.bytes;
+    });
+  }).catch(()=>{ /* IndexedDB unavailable — app still works with the starter set */ });
+}
+
+/* ---------- RATE-LIMITED DOWNLOAD QUEUE ----------
+   bible-api.com allows ~15 requests / 30 seconds. We space requests
+   ~2.1s apart so bulk downloads never get throttled or blocked. */
+const fetchQueue = [];
+let queueRunning = false;
+function queueFetchChapter(book,chap){
+  return new Promise((resolve,reject)=>{
+    fetchQueue.push({book,chap,resolve,reject});
+    runQueue();
+  });
+}
+function runQueue(){
+  if(queueRunning) return;
+  queueRunning = true;
+  const step = ()=>{
+    if(!fetchQueue.length){ queueRunning=false; return; }
+    const {book,chap,resolve,reject} = fetchQueue.shift();
+    fetch(`https://bible-api.com/${encodeURIComponent(book+' '+chap)}?translation=kjv`)
+      .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(data=>{
+        const verses = (data.verses||[]).map(v=>v.text.trim());
+        storeCachedChapter(book,chap,verses);
+        resolve(verses);
+      })
+      .catch(err=>reject(err))
+      .finally(()=>{ setTimeout(step, 2100); });
+  };
+  step();
+}
+
+const HIGHLIGHT_TYPES = {
+  important: {label:"Important Verse", icon:"⭐"},
+  promise: {label:"Promise", icon:"🤝"},
+  warning: {label:"Warning", icon:"⚠️"},
+  command: {label:"Command", icon:"📜"},
+  encouragement: {label:"Encouragement", icon:"💛"},
+  reflection: {label:"Personal Reflection", icon:"🪞"}
+};
+
+const LEVELS = [
+  {min:0, title:"Scripture Beginner"},
+  {min:100, title:"Faithful Reader"},
+  {min:300, title:"Devoted Disciple"},
+  {min:600, title:"Faith Builder"},
+  {min:1200, title:"Word Warrior"},
+  {min:2200, title:"Bible Explorer"},
+  {min:3500, title:"Scripture Scholar"},
+  {min:5500, title:"Wisdom Seeker"},
+  {min:8000, title:"Scripture Master"},
+  {min:12000, title:"Elder of the Word"}
+];
+
+const ACHIEVEMENTS = [
+  {id:"streak7", icon:"🔥", name:"7 Day Streak", check:s=>s.streak>=7},
+  {id:"streak30", icon:"🔥", name:"30 Day Streak", check:s=>s.streak>=30},
+  {id:"streak365", icon:"🏆", name:"365 Day Journey", check:s=>s.streak>=365},
+  {id:"firstChapter", icon:"📖", name:"First Chapter Read", check:s=>s.chaptersRead.length>=1},
+  {id:"tenChapters", icon:"📚", name:"10 Chapters Read", check:s=>s.chaptersRead.length>=10},
+  {id:"hundredVerses", icon:"⭐", name:"100 Verses Saved", check:s=>Object.keys(s.bookmarks).length>=100},
+  {id:"tenVerses", icon:"✨", name:"10 Verses Saved", check:s=>Object.keys(s.bookmarks).length>=10},
+  {id:"prayerJournal", icon:"🕊️", name:"Prayer Journal Started", check:s=>s.journal.some(e=>e.type==="prayer")},
+  {id:"tenEntries", icon:"✍️", name:"10 Journal Entries", check:s=>s.journal.length>=10},
+  {id:"firstQuiz", icon:"❓", name:"First Quiz Completed", check:s=>s.quizzesTaken>=1},
+  {id:"quizAce", icon:"🎯", name:"Perfect Quiz Score", check:s=>s.perfectQuiz},
+  {id:"firstChallenge", icon:"🏁", name:"Challenge Started", check:s=>Object.keys(s.challenges).length>=1},
+  {id:"level10", icon:"🌟", name:"Reached Level 10", check:s=>currentLevelIndex(s.xp)>=9},
+  {id:"memoryVerse", icon:"🧠", name:"First Verse Memorized", check:s=>s.memorized.length>=1}
+];
+
+const CHARACTERS = [
+  {name:"Jesus", story:"The central figure of the New Testament — teacher, healer, and, in Christian belief, the Son of God who died and rose again.", events:"Sermon on the Mount, miracles, crucifixion, resurrection.", lessons:"Sacrificial love, humility, forgiveness.", verses:"John 3:16, Matthew 5, Philippians 4:13"},
+  {name:"Moses", story:"Raised in Pharaoh's household, called by God at the burning bush to lead Israel out of slavery in Egypt.", events:"The Exodus, parting of the Red Sea, receiving the Ten Commandments.", lessons:"Obedience despite self-doubt, perseverance through leadership.", verses:"Exodus 3, Exodus 14"},
+  {name:"David", story:"A shepherd boy anointed king of Israel, known for defeating Goliath and writing many of the Psalms.", events:"Defeating Goliath, becoming king, his psalms of worship and repentance.", lessons:"Courage, worship in every season, honest repentance.", verses:"Psalm 23, Psalm 51, 1 Samuel 17"},
+  {name:"Paul", story:"Once a persecutor of the early church, transformed after an encounter with Christ on the road to Damascus into its most prolific missionary and writer.", events:"Conversion on the Damascus road, missionary journeys, writing many New Testament letters.", lessons:"Radical transformation, perseverance through hardship.", verses:"1 Corinthians 13, Philippians 4, Romans 8"},
+  {name:"Peter", story:"A fisherman called to be one of Jesus' twelve disciples, later a leader of the early church.", events:"Walking on water, denying Jesus three times, restoration and Pentecost.", lessons:"Grace after failure, bold faith.", verses:"Matthew 14, John 21"},
+  {name:"Abraham", story:"Called by God to leave his homeland and become the father of a great nation, the origin of the Israelite people.", events:"The call to leave Ur, covenant with God, the offering of Isaac.", lessons:"Faith that trusts God's promises even when the path is unclear.", verses:"Genesis 12, Genesis 22"},
+  {name:"Joseph", story:"Sold into slavery by his own brothers, he rose to become second-in-command of Egypt and ultimately saved his family from famine.", events:"Sold into slavery, imprisonment, rise to power in Egypt, reconciliation with his brothers.", lessons:"Forgiveness, trusting God's plan through suffering.", verses:"Genesis 37, Genesis 45"}
+];
+
+const TIMELINE = [
+  {era:"Creation", detail:"The beginning of the world, described in Genesis 1–2."},
+  {era:"The Flood", detail:"Noah and the great flood, Genesis 6–9."},
+  {era:"Abraham & the Patriarchs", detail:"God's covenant with Abraham, Isaac, and Jacob."},
+  {era:"Israel in Egypt & the Exodus", detail:"Slavery in Egypt and deliverance under Moses."},
+  {era:"The Kings", detail:"Saul, David, and Solomon establish the united kingdom."},
+  {era:"The Prophets", detail:"Prophets call Israel and Judah back to covenant faithfulness."},
+  {era:"Jesus Christ", detail:"The life, death, and resurrection of Jesus in the Gospels."},
+  {era:"The Early Church", detail:"The spread of the gospel recorded in Acts and the Epistles."}
+];
+
+const QUIZ_BANK = {
+  easy: [
+    {q:"Who was thrown into a den of lions?", choices:["Daniel","Samson","Elijah","Jonah"], a:0},
+    {q:"How many days did God take to create the world (including the day of rest)?", choices:["5","6","7","10"], a:2},
+    {q:"Who built the ark?", choices:["Moses","Noah","Abraham","David"], a:1},
+    {q:"'The LORD is my shepherd' begins which Psalm?", choices:["Psalm 1","Psalm 23","Psalm 100","Psalm 46"], a:1}
+  ],
+  medium: [
+    {q:"Who denied Jesus three times?", choices:["John","Peter","Judas","Thomas"], a:1},
+    {q:"Which letter contains the famous 'love chapter'?", choices:["Romans","Galatians","1 Corinthians","James"], a:2},
+    {q:"Who was sold into slavery by his brothers?", choices:["Joseph","Benjamin","Reuben","Judah"], a:0},
+    {q:"True or False: Paul was originally named Saul.", choices:["True","False"], a:0}
+  ],
+  hard: [
+    {q:"On the road to which city did Paul encounter Christ?", choices:["Jerusalem","Damascus","Antioch","Corinth"], a:1},
+    {q:"Which mountain did Moses receive the Ten Commandments on?", choices:["Sinai","Carmel","Nebo","Ararat"], a:0},
+    {q:"Complete: 'I can do all things through Christ which ___ me.'", choices:["saveth","strengtheneth","keepeth","calleth"], a:1}
+  ]
+};
+
+const CHALLENGE_DEFS = [
+  {id:"gospel30", name:"30-Day Gospel Challenge", desc:"Walk through the life of Jesus in 30 days.", total:30},
+  {id:"proverbsDaily", name:"Proverbs Challenge", desc:"One chapter of Proverbs daily for a month.", total:31},
+  {id:"psalmChallenge", name:"Psalm Challenge", desc:"Daily encouragement, one Psalm a day.", total:30},
+  {id:"ntChallenge", name:"New Testament Challenge", desc:"Read through the entire New Testament.", total:260}
+];
+
+const ADVENTURE_TOPICS = [
+  {topic:"Faith During Difficult Times", read:"Psalm 23", reflect:"What does trusting God mean in this situation?"},
+  {topic:"The Meaning of True Love", read:"1 Corinthians 13", reflect:"Where in your life is love being tested right now?"},
+  {topic:"Walking in Wisdom", read:"Proverbs 3", reflect:"What decision could you hand over to God this week?"},
+  {topic:"Finding Rest", read:"Psalm 46", reflect:"What would it look like to 'be still' today?"},
+  {topic:"New Beginnings", read:"Genesis 1", reflect:"What is God inviting you to start fresh?"},
+  {topic:"Living Sent", read:"Matthew 5", reflect:"Who around you needs to see this lived out?"},
+  {topic:"Strength for the Weary", read:"Philippians 4", reflect:"What burden could you exchange for God's strength today?"},
+  {topic:"Character Study: Joseph", read:"Genesis 37 & 45 (see Characters tab)", reflect:"How has God used a hard season in your life for good?"}
+];
+
+/* ---------- STATE ---------- */
+const DEFAULT_STATE = {
+  xp:0, streak:0, longestStreak:0, lastActiveDate:null,
+  chaptersRead:[], bookmarks:{}, notes:{}, highlights:{},
+  journal:[], memorized:[], srs:{}, quizzesTaken:0, quizScore:0, quizTotalQ:0,
+  perfectQuiz:false, challenges:{}, missions:{date:null, items:{}}, unlockedAch:[],
+  theme:"parchment"
+};
+let state = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem('scriptureQuestState');
+    if(!raw) return structuredCloneSafe(DEFAULT_STATE);
+    const parsed = JSON.parse(raw);
+    return Object.assign(structuredCloneSafe(DEFAULT_STATE), parsed);
+  }catch(e){ return structuredCloneSafe(DEFAULT_STATE); }
+}
+function structuredCloneSafe(o){ return JSON.parse(JSON.stringify(o)); }
+function saveState(){ localStorage.setItem('scriptureQuestState', JSON.stringify(state)); }
+
+/* ---------- UTIL ---------- */
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function toast(msg, icon){
+  const el = document.createElement('div');
+  el.className='toast';
+  el.innerHTML = `<span>${icon||'✨'}</span><span>${msg}</span>`;
+  document.getElementById('toastLayer').appendChild(el);
+  setTimeout(()=>el.remove(), 2200);
+}
+function currentLevelIndex(xp){
+  let idx=0;
+  for(let i=0;i<LEVELS.length;i++){ if(xp>=LEVELS[i].min) idx=i; }
+  return idx;
+}
+function addXP(amount, reason){
+  state.xp += amount;
+  saveState();
+  toast(`+${amount} XP — ${reason}`, '⚡');
+  renderHeader();
+  checkAchievements();
+}
+
+/* ---------- STREAK HANDLING ---------- */
+function touchStreak(){
+  const today = todayStr();
+  if(state.lastActiveDate === today) return;
+  const y = new Date(); y.setDate(y.getDate()-1);
+  const yesterday = y.toISOString().slice(0,10);
+  if(state.lastActiveDate === yesterday){ state.streak += 1; }
+  else { state.streak = 1; }
+  if(state.streak > state.longestStreak) state.longestStreak = state.streak;
+  state.lastActiveDate = today;
+  if(state.missions.date !== today){ state.missions = {date:today, items:{}}; }
+  saveState();
+}
+
+/* ---------- HEADER ---------- */
+function renderHeader(){
+  document.getElementById('streakVal').textContent = state.streak;
+  const li = currentLevelIndex(state.xp);
+  const cur = LEVELS[li];
+  const next = LEVELS[li+1];
+  document.getElementById('levelTitle').textContent = `Lv.${li+1} ${cur.title}`;
+  const pct = next ? Math.min(100, Math.round(((state.xp-cur.min)/(next.min-cur.min))*100)) : 100;
+  document.getElementById('xpMiniBar').style.width = pct+'%';
+}
+
+/* ---------- TABS ---------- */
+document.getElementById('tabs').addEventListener('click', e=>{
+  const btn = e.target.closest('button[data-tab]');
+  if(!btn) return;
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tabpanel').forEach(p=>p.style.display='none');
+  document.getElementById('tab-'+btn.dataset.tab).style.display='block';
+  if(btn.dataset.tab==='home') renderMissions();
+  if(btn.dataset.tab==='achievements') renderAchievements();
+  if(btn.dataset.tab==='challenges') renderChallenges();
+  if(btn.dataset.tab==='characters') renderCharacters();
+  if(btn.dataset.tab==='timeline') renderTimeline();
+  if(btn.dataset.tab==='journal') renderJournal();
+  if(btn.dataset.tab==='study') renderReviewQueue();
+  if(btn.dataset.tab==='settings'){ renderThemes(); renderLibraryPanel(); }
+});
+
+/* ---------- MISSIONS ---------- */
+const MISSION_DEFS = [
+  {id:"read", label:"Read today's chapter", xp:15},
+  {id:"reflect", label:"Write a reflection", xp:10},
+  {id:"memorize", label:"Memorize a verse", xp:20},
+  {id:"answer", label:"Answer study questions (take a quiz)", xp:15}
+];
+function renderMissions(){
+  const today = todayStr();
+  if(state.missions.date !== today){ state.missions = {date:today, items:{}}; saveState(); }
+  const list = document.getElementById('missionList');
+  list.innerHTML = MISSION_DEFS.map(m=>{
+    const done = !!state.missions.items[m.id];
+    return `<div class="mission ${done?'done':''}" data-mid="${m.id}">
+      <div class="check">${done?'✓':''}</div>
+      <div class="label">${m.label}</div>
+      <div class="xp">+${m.xp} XP</div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.mission').forEach(el=>{
+    el.addEventListener('click', ()=>completeMission(el.dataset.mid));
+  });
+  document.getElementById('statXP').textContent = state.xp;
+  document.getElementById('statStreak').textContent = state.streak;
+  document.getElementById('statLongest').textContent = state.longestStreak;
+  document.getElementById('statChapters').textContent = state.chaptersRead.length;
+  document.getElementById('statVerses').textContent = Object.keys(state.bookmarks).length;
+  document.getElementById('statEntries').textContent = state.journal.length;
+}
+function completeMission(id){
+  if(state.missions.items[id]) return;
+  const def = MISSION_DEFS.find(m=>m.id===id);
+  state.missions.items[id]=true;
+  saveState();
+  addXP(def.xp, def.label);
+  renderMissions();
+}
+function autoCompleteMission(id){
+  if(state.missions.date !== todayStr()){ state.missions = {date:todayStr(), items:{}}; }
+  if(!state.missions.items[id]) completeMission(id);
+}
+
+/* ---------- ACHIEVEMENTS ---------- */
+function checkAchievements(){
+  ACHIEVEMENTS.forEach(a=>{
+    if(!state.unlockedAch.includes(a.id) && a.check(state)){
+      state.unlockedAch.push(a.id);
+      toast(`Achievement unlocked: ${a.name}`, a.icon);
+    }
+  });
+  saveState();
+}
+function renderAchievements(){
+  const grid = document.getElementById('achGrid');
+  grid.innerHTML = ACHIEVEMENTS.map(a=>{
+    const unlocked = state.unlockedAch.includes(a.id);
+    return `<div class="ach ${unlocked?'unlocked':''}">
+      <span class="icon">${a.icon}</span>
+      <div class="name">${a.name}</div>
+      ${unlocked?'':'<div class="name" style="opacity:.7;">Locked</div>'}
+    </div>`;
+  }).join('');
+}
+
+/* ---------- READER ---------- */
+let currentBook = "Psalms", currentChapter = 23;
+function populateBookSelect(){
+  const sel = document.getElementById('bookSelect');
+  const ot = BOOK_META.filter(b=>b.testament==='OT');
+  const nt = BOOK_META.filter(b=>b.testament==='NT');
+  const opt = b=>`<option value="${b.name}">${b.name}</option>`;
+  sel.innerHTML = `<optgroup label="Old Testament">${ot.map(opt).join('')}</optgroup>` +
+                  `<optgroup label="New Testament">${nt.map(opt).join('')}</optgroup>`;
+  sel.value = currentBook;
+  populateChapterSelect();
+}
+function populateChapterSelect(){
+  const sel = document.getElementById('chapterSelect');
+  const total = BOOK_CHAPTERS[currentBook] || 1;
+  let opts = '';
+  for(let c=1;c<=total;c++) opts += `<option value="${c}">Chapter ${c}</option>`;
+  sel.innerHTML = opts;
+  sel.value = currentChapter;
+}
+document.getElementById('bookSelect').addEventListener('change', e=>{
+  currentBook = e.target.value;
+  currentChapter = 1;
+  populateChapterSelect();
+  renderChapter();
+});
+document.getElementById('chapterSelect').addEventListener('change', e=>{
+  currentChapter = Number(e.target.value);
+  renderChapter();
+});
+function verseKey(book, chap, vnum){ return `${book}|${chap}|${vnum}`; }
+function renderChapter(){
+  document.getElementById('readerHeader').innerHTML = `<h2>${currentBook} ${currentChapter}</h2>`;
+  const verses = getCachedChapter(currentBook, currentChapter);
+  const box = document.getElementById('chapterText');
+  if(verses){
+    box.innerHTML = verses.map((text,i)=>{
+      const vnum = i+1;
+      const key = verseKey(currentBook,currentChapter,vnum);
+      const hl = state.highlights[key];
+      return `<span class="verse ${hl?'hl-'+hl:''}" data-key="${key}" data-vnum="${vnum}"><span class="vnum">${vnum}</span>${text}</span> `;
+    }).join('');
+    box.querySelectorAll('.verse').forEach(el=>{
+      el.addEventListener('click', e=>openVerseMenu(e, el.dataset.key, el.dataset.vnum));
+    });
+    return;
+  }
+  // Not cached yet — try to fetch it, or offer a manual download button
+  box.innerHTML = `<p class="muted">This chapter isn't downloaded yet.</p>
+    <button class="btn small" id="dlChapterBtn">⬇️ Download ${currentBook} ${currentChapter}</button>`;
+  document.getElementById('dlChapterBtn')?.addEventListener('click', ()=>downloadChapter(currentBook, currentChapter, true));
+  if(navigator.onLine) downloadChapter(currentBook, currentChapter, false);
+}
+function downloadChapter(book, chap, isManual){
+  queueFetchChapter(book, chap).then(()=>{
+    if(book===currentBook && chap===currentChapter) renderChapter();
+    if(isManual) toast(`${book} ${chap} downloaded`,'📖');
+  }).catch(()=>{
+    if(isManual) toast('No connection — try again when online','📡');
+  });
+}
+document.getElementById('markReadBtn').addEventListener('click', ()=>{
+  const key = `${currentBook} ${currentChapter}`;
+  if(!state.chaptersRead.includes(key)){
+    state.chaptersRead.push(key);
+    saveState();
+    addXP(15, `Read ${key}`);
+  } else {
+    toast('Already marked read today — nice consistency!', '📖');
+  }
+  touchStreak();
+  autoCompleteMission('read');
+  checkAchievements();
+});
+document.getElementById('copyChapterBtn').addEventListener('click', ()=>{
+  const verses = getCachedChapter(currentBook, currentChapter) || [];
+  const text = `${currentBook} ${currentChapter}\n` + verses.map((t,i)=>`${i+1}. ${t}`).join('\n');
+  navigator.clipboard?.writeText(text).then(()=>toast('Chapter copied','📋')).catch(()=>toast('Copy failed — select text manually','⚠️'));
+});
+
+/* verse context menu */
+const verseMenu = document.getElementById('verseMenu');
+let activeVerseKey = null;
+function openVerseMenu(e, key, vnum){
+  activeVerseKey = key;
+  const [book,chap] = key.split('|');
+  const text = getCachedChapter(book, Number(chap))[vnum-1];
+  verseMenu.innerHTML = `
+    <div style="font-size:12px; padding:4px 8px 8px; color:var(--text-soft);">${book} ${chap}:${vnum}</div>
+    <div class="hl-row">
+      ${Object.entries(HIGHLIGHT_TYPES).map(([k,v])=>`<button class="btn small secondary" data-hl="${k}" title="${v.label}">${v.icon}</button>`).join('')}
+      <button class="btn small ghost" data-hl="clear">✕</button>
+    </div>
+    <button data-act="bookmark">${state.bookmarks[key]?'★ Remove Bookmark':'☆ Bookmark Verse'}</button>
+    <button data-act="note">📝 Add / Edit Note</button>
+    <button data-act="copy">📋 Copy Verse</button>
+    <button data-act="share">🔗 Share Verse</button>
+    <button data-act="memorize">🧠 Practice Memory</button>
+    <button data-act="study">🧭 Open in Study Mode</button>
+  `;
+  verseMenu.style.display='flex';
+  const rect = e.target.getBoundingClientRect();
+  let top = rect.bottom + window.scrollY + 4;
+  let left = Math.min(rect.left + window.scrollX, window.innerWidth-210);
+  verseMenu.style.top = top+'px';
+  verseMenu.style.left = Math.max(8,left)+'px';
+
+  verseMenu.querySelectorAll('[data-hl]').forEach(b=>b.onclick = ()=>{
+    if(b.dataset.hl==='clear'){ delete state.highlights[key]; }
+    else { state.highlights[key] = b.dataset.hl; }
+    saveState(); renderChapter(); closeVerseMenu();
+  });
+  verseMenu.querySelector('[data-act="bookmark"]').onclick = ()=>{
+    if(state.bookmarks[key]) delete state.bookmarks[key];
+    else { state.bookmarks[key] = text; addXP(5,'Verse saved'); }
+    saveState(); checkAchievements(); closeVerseMenu();
+  };
+  verseMenu.querySelector('[data-act="note"]').onclick = ()=>{
+    const existing = state.notes[key] || '';
+    const note = prompt(`Note for ${book} ${chap}:${vnum}`, existing);
+    if(note !== null){ state.notes[key] = note; saveState(); toast('Note saved','📝'); }
+    closeVerseMenu();
+  };
+  verseMenu.querySelector('[data-act="copy"]').onclick = ()=>{
+    navigator.clipboard?.writeText(`"${text}" — ${book} ${chap}:${vnum}`).then(()=>toast('Verse copied','📋'));
+    closeVerseMenu();
+  };
+  verseMenu.querySelector('[data-act="share"]').onclick = ()=>{
+    const shareText = `"${text}" — ${book} ${chap}:${vnum}`;
+    if(navigator.share){ navigator.share({text:shareText}).catch(()=>{}); }
+    else { navigator.clipboard?.writeText(shareText); toast('Copied for sharing','🔗'); }
+    closeVerseMenu();
+  };
+  verseMenu.querySelector('[data-act="memorize"]').onclick = ()=>{
+    startMemoryPractice(book,chap,vnum,text);
+    closeVerseMenu();
+  };
+  verseMenu.querySelector('[data-act="study"]').onclick = ()=>{
+    openStudyModeFor(book,chap,vnum,text);
+    closeVerseMenu();
+  };
+}
+function closeVerseMenu(){ verseMenu.style.display='none'; }
+document.addEventListener('click', e=>{
+  if(!verseMenu.contains(e.target) && !e.target.closest('.verse')) closeVerseMenu();
+});
+
+/* search */
+document.getElementById('searchBox').addEventListener('input', e=>{
+  const q = e.target.value.trim().toLowerCase();
+  const results = document.getElementById('searchResults');
+  if(q.length<3){ results.innerHTML=''; return; }
+  let hits=[];
+  Object.entries(BIBLE).forEach(([book,chaps])=>{
+    Object.entries(chaps).forEach(([chap,verses])=>{
+      verses.forEach((v,i)=>{
+        if(v.toLowerCase().includes(q)) hits.push({book,chap,vnum:i+1,text:v});
+      });
+    });
+  });
+  results.innerHTML = hits.length ? hits.slice(0,15).map(h=>
+    `<div class="verse" style="display:block; margin-bottom:6px;" data-jump="${h.book}|${h.chap}">
+      <b>${h.book} ${h.chap}:${h.vnum}</b> — ${h.text}
+    </div>`).join('') : `<p class="muted">No matches in your downloaded chapters yet. Search only covers books/chapters you've already read or downloaded — download more in Settings → Bible Library.</p>`;
+  results.querySelectorAll('[data-jump]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const [b,c] = el.dataset.jump.split('|');
+      currentBook=b; currentChapter=Number(c);
+      document.getElementById('bookSelect').value=b;
+      populateChapterSelect();
+      renderChapter();
+      results.innerHTML=''; e.target.value='';
+    });
+  });
+});
+
+/* ---------- STUDY MODES ---------- */
+let studyMode = 'quick';
+function setStudyMode(mode){ studyMode = mode; toast(`Study mode set: ${mode}`, '🧭'); }
+function openStudyModeFor(book,chap,vnum,text){
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  document.querySelector('[data-tab="study"]').classList.add('active');
+  document.querySelectorAll('.tabpanel').forEach(p=>p.style.display='none');
+  document.getElementById('tab-study').style.display='block';
+  const out = document.getElementById('studyModeOutput');
+  const ref = `${book} ${chap}:${vnum}`;
+  if(studyMode==='quick'){
+    out.innerHTML = `<h3>${ref}</h3><p class="chapter-text">"${text}"</p>`;
+  } else if(studyMode==='deep'){
+    out.innerHTML = `<h3>Deep Study — ${ref}</h3>
+      <p class="chapter-text">"${text}"</p>
+      <h3 style="margin-top:12px;">Context</h3><p class="muted">Consider who wrote this book, who the original audience was, and what came just before and after this verse.</p>
+      <h3 style="margin-top:12px;">Meaning</h3><p class="muted">What is the plain meaning of the words? What is being promised, commanded, or described?</p>
+      <h3 style="margin-top:12px;">Related Verses</h3><p class="muted">Search the Read tab for similar words or themes to find cross-references.</p>
+      <h3 style="margin-top:12px;">Reflection Questions</h3><p class="muted">How does this apply to your life this week? What would change if you fully believed this?</p>`;
+  } else if(studyMode==='devotional'){
+    out.innerHTML = `<h3>Devotional — ${ref}</h3>
+      <p class="chapter-text">"${text}"</p>
+      <h3 style="margin-top:12px;">Thought</h3><p class="muted">Sit with this verse slowly. What word or phrase stands out to you?</p>
+      <h3 style="margin-top:12px;">Application</h3><p class="muted">Name one concrete way to live this out today.</p>
+      <h3 style="margin-top:12px;">Prayer</h3><p class="muted">Turn the verse into a short prayer, and write it in your Journal.</p>`;
+  } else if(studyMode==='memory'){
+    out.innerHTML = `<h3>Memory Practice — ${ref}</h3><div id="memoryHost"></div>`;
+    startMemoryPractice(book,chap,vnum,text,'memoryHost');
+  }
+  autoCompleteMission('answer'); // engaging with study counts toward today's mission set loosely
+}
+
+/* ---------- SPACED REPETITION ENGINE ----------
+   Simple fixed-interval schedule: Day 1 (learn) -> Day 3 -> Day 7 -> Day 30 -> Mastered.
+   A wrong/self-reported "still learning" answer resets the verse to
+   review again tomorrow, rather than losing all progress. */
+const SRS_INTERVALS = [3, 7, 30]; // days to wait AFTER each successful stage
+function addDaysISO(days){
+  const d = new Date();
+  d.setDate(d.getDate()+days);
+  return d.toISOString();
+}
+function initSrsEntry(key, ref, text){
+  state.srs[key] = { stage:0, next: addDaysISO(SRS_INTERVALS[0]), ref, text, mastered:false };
+  saveState();
+}
+function gradeReview(key, gotIt){
+  const entry = state.srs[key];
+  if(!entry) return;
+  if(gotIt){
+    const nextStage = entry.stage + 1;
+    if(nextStage >= SRS_INTERVALS.length){
+      entry.mastered = true;
+      entry.next = null;
+      toast(`🏆 ${entry.ref} mastered!`, '🧠');
+    } else {
+      entry.stage = nextStage;
+      entry.next = addDaysISO(SRS_INTERVALS[nextStage]);
+      toast(`Nice — next review in ${SRS_INTERVALS[nextStage]} days`, '🔁');
+    }
+  } else {
+    entry.stage = 0;
+    entry.next = addDaysISO(1);
+    toast('No worries — back in the queue for tomorrow','💪');
+  }
+  saveState();
+  renderReviewQueue();
+}
+function getDueReviews(){
+  const now = Date.now();
+  return Object.entries(state.srs)
+    .filter(([k,e])=> !e.mastered && e.next && new Date(e.next).getTime() <= now)
+    .map(([k,e])=>({key:k, ...e}));
+}
+function getUpcomingReviews(){
+  const now = Date.now();
+  return Object.entries(state.srs)
+    .filter(([k,e])=> !e.mastered && e.next && new Date(e.next).getTime() > now)
+    .map(([k,e])=>({key:k, ...e}))
+    .sort((a,b)=>new Date(a.next)-new Date(b.next));
+}
+function renderReviewQueue(){
+  const due = getDueReviews();
+  const homeCard = document.getElementById('homeReviewCard');
+  if(homeCard){
+    if(due.length){
+      homeCard.style.display='block';
+      document.getElementById('homeReviewCount').textContent = due.length;
+    } else {
+      homeCard.style.display='none';
+    }
+  }
+  const host = document.getElementById('reviewQueueHost');
+  if(!host) return;
+  const upcoming = getUpcomingReviews();
+  const masteredCount = Object.values(state.srs).filter(e=>e.mastered).length;
+  let html = `<div class="stat-grid" style="margin-bottom:12px;">
+    <div class="stat-box"><b>${due.length}</b><span>Due Today</span></div>
+    <div class="stat-box"><b>${upcoming.length}</b><span>Upcoming</span></div>
+    <div class="stat-box"><b>${masteredCount}</b><span>Mastered</span></div>
+  </div>`;
+  if(!due.length){
+    html += `<p class="muted">Nothing due right now. ${upcoming.length ? `Next review: ${upcoming[0].ref} on ${new Date(upcoming[0].next).toLocaleDateString()}.` : 'Memorize a verse from the Read tab to start building your review queue.'}</p>`;
+  } else {
+    html += due.map(e=>`
+      <div class="card" style="margin:0 0 10px;" data-flash="${e.key}">
+        <p class="pill">Stage ${e.stage+1} of ${SRS_INTERVALS.length}</p>
+        <h3 style="margin:8px 0;">${e.ref}</h3>
+        <p class="muted flash-hidden">Tap "Show Verse" to reveal, then recite it from memory before checking.</p>
+        <p class="chapter-text flash-text" style="display:none;">"${e.text}"</p>
+        <div class="row" style="margin-top:10px;">
+          <button class="btn small secondary flash-show">👁 Show Verse</button>
+          <button class="btn small flash-got" style="display:none;">✅ Got It</button>
+          <button class="btn small ghost flash-miss" style="display:none;">😅 Still Learning</button>
+        </div>
+      </div>`).join('');
+  }
+  host.innerHTML = html;
+  host.querySelectorAll('[data-flash]').forEach(card=>{
+    const key = card.dataset.flash;
+    card.querySelector('.flash-show').addEventListener('click', ()=>{
+      card.querySelector('.flash-hidden').style.display='none';
+      card.querySelector('.flash-text').style.display='block';
+      card.querySelector('.flash-show').style.display='none';
+      card.querySelector('.flash-got').style.display='inline-flex';
+      card.querySelector('.flash-miss').style.display='inline-flex';
+    });
+    card.querySelector('.flash-got').addEventListener('click', ()=>gradeReview(key, true));
+    card.querySelector('.flash-miss').addEventListener('click', ()=>gradeReview(key, false));
+  });
+}
+
+/* ---------- MEMORY MODE ---------- */
+function startMemoryPractice(book,chap,vnum,text,hostId){
+  const words = text.split(' ');
+  const blanks = new Set();
+  while(blanks.size < Math.min(3, Math.floor(words.length*0.2))){
+    blanks.add(Math.floor(Math.random()*words.length));
+  }
+  const displayHTML = words.map((w,i)=> blanks.has(i) ? `<input type="text" data-idx="${i}" style="width:${Math.max(50,w.length*10)}px; display:inline-block; margin:2px;">` : w).join(' ');
+  const html = `
+    <p class="muted">${book} ${chap}:${vnum} — fill in the missing words:</p>
+    <p class="chapter-text" id="memBlank">${displayHTML}</p>
+    <button class="btn small" id="memCheckBtn">Check</button>
+    <span id="memResult" style="margin-left:8px; font-weight:700;"></span>`;
+  if(hostId){ document.getElementById(hostId).innerHTML = html; }
+  else {
+    const modalHost = document.createElement('div');
+    modalHost.className='card';
+    modalHost.innerHTML = `<h3>Memory Practice</h3>${html}`;
+    document.getElementById('tab-home').prepend(modalHost);
+  }
+  document.getElementById('memCheckBtn').onclick = ()=>{
+    let correct = true;
+    document.querySelectorAll('#memBlank input').forEach(inp=>{
+      const idx = Number(inp.dataset.idx);
+      const target = words[idx].replace(/[.,;:!?]/g,'').toLowerCase();
+      const val = inp.value.trim().replace(/[.,;:!?]/g,'').toLowerCase();
+      if(val!==target){ correct=false; inp.style.borderColor='var(--ember)'; }
+      else{ inp.style.borderColor='var(--sage)'; }
+    });
+    document.getElementById('memResult').textContent = correct ? '✓ Correct!' : 'Keep practicing';
+    document.getElementById('memResult').style.color = correct ? 'var(--sage)' : 'var(--ember)';
+    if(correct){
+      const key = verseKey(book,chap,vnum);
+      if(!state.memorized.includes(key)){
+        state.memorized.push(key); saveState();
+        addXP(20,'Verse memorized');
+        autoCompleteMission('memorize');
+        checkAchievements();
+      }
+      if(!state.srs[key]){
+        initSrsEntry(key, `${book} ${chap}:${vnum}`, text);
+        toast('Added to your Review Queue — next check-in in 3 days','🔁');
+      }
+    }
+  };
+}
+
+/* ---------- JOURNAL ---------- */
+document.getElementById('saveEntryBtn').addEventListener('click', ()=>{
+  const type = document.getElementById('entryType').value;
+  const text = document.getElementById('entryText').value.trim();
+  if(!text){ toast('Write something first','✍️'); return; }
+  state.journal.unshift({type, text, date:new Date().toISOString()});
+  saveState();
+  document.getElementById('entryText').value='';
+  addXP(10, 'Journal entry saved');
+  touchStreak();
+  autoCompleteMission('reflect');
+  checkAchievements();
+  renderJournal();
+});
+function renderJournal(q){
+  const list = document.getElementById('journalList');
+  let entries = state.journal;
+  if(q){ entries = entries.filter(e=>e.text.toLowerCase().includes(q.toLowerCase())); }
+  list.innerHTML = entries.length ? entries.map((e,i)=>`
+    <div class="entry">
+      <div class="meta"><span class="pill">${e.type}</span> ${new Date(e.date).toLocaleString()}</div>
+      <div>${escapeHTML(e.text)}</div>
+    </div>`).join('') : `<div class="empty">No journal entries yet — write your first reflection above.</div>`;
+}
+document.getElementById('journalSearch').addEventListener('input', e=>renderJournal(e.target.value));
+document.getElementById('exportJournalBtn').addEventListener('click', ()=>{
+  const text = state.journal.map(e=>`[${e.type}] ${new Date(e.date).toLocaleString()}\n${e.text}\n`).join('\n---\n');
+  downloadText('scripture-quest-journal.txt', text || 'No entries yet.');
+});
+function escapeHTML(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function downloadText(filename, text){
+  const blob = new Blob([text], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- QUIZ ---------- */
+let quizQueue = [], quizIndex=0, quizSessionScore=0;
+document.getElementById('startQuizBtn').addEventListener('click', ()=>{
+  const diff = document.getElementById('quizDifficulty').value;
+  quizQueue = [...QUIZ_BANK[diff]].sort(()=>Math.random()-0.5);
+  quizIndex=0; quizSessionScore=0;
+  document.getElementById('quizArea').style.display='block';
+  renderQuizQuestion();
+});
+function renderQuizQuestion(){
+  const area = document.getElementById('quizArea');
+  if(quizIndex >= quizQueue.length){
+    state.quizzesTaken += 1;
+    state.quizScore += quizSessionScore;
+    state.quizTotalQ += quizQueue.length;
+    if(quizSessionScore === quizQueue.length) state.perfectQuiz = true;
+    saveState();
+    addXP(quizSessionScore*10, 'Quiz completed');
+    autoCompleteMission('answer');
+    checkAchievements();
+    document.getElementById('quizScore').textContent = state.quizScore;
+    document.getElementById('quizTotal').textContent = state.quizTotalQ;
+    area.innerHTML = `<h3>Quiz complete!</h3><p>You scored ${quizSessionScore} / ${quizQueue.length}</p><button class="btn small" onclick="document.getElementById('startQuizBtn').click()">Play Again</button>`;
+    return;
+  }
+  const q = quizQueue[quizIndex];
+  area.innerHTML = `<p class="pill">Question ${quizIndex+1} / ${quizQueue.length}</p>
+    <h3 style="margin:10px 0;">${q.q}</h3>
+    ${q.choices.map((c,i)=>`<button class="quiz-opt" data-i="${i}">${c}</button>`).join('')}`;
+  area.querySelectorAll('.quiz-opt').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const i = Number(btn.dataset.i);
+      area.querySelectorAll('.quiz-opt').forEach(b=>b.disabled=true);
+      if(i===q.a){ btn.classList.add('correct'); quizSessionScore++; }
+      else{
+        btn.classList.add('wrong');
+        area.querySelectorAll('.quiz-opt')[q.a].classList.add('correct');
+      }
+      setTimeout(()=>{ quizIndex++; renderQuizQuestion(); }, 900);
+    });
+  });
+}
+
+/* ---------- CHALLENGES ---------- */
+function renderChallenges(){
+  const host = document.getElementById('challengeList');
+  host.innerHTML = CHALLENGE_DEFS.map(c=>{
+    const prog = state.challenges[c.id];
+    const started = !!prog;
+    const day = started ? prog.day : 0;
+    const pct = started ? Math.round((day/c.total)*100) : 0;
+    return `<div class="challenge">
+      <h3>${c.name}</h3>
+      <p class="muted">${c.desc}</p>
+      <div class="progress-bar"><div style="width:${pct}%"></div></div>
+      <p class="muted">${started ? `Day ${day} of ${c.total}` : 'Not started'}</p>
+      <div class="row">
+        ${!started ? `<button class="btn small" data-start="${c.id}">Start Challenge</button>` : `
+          <button class="btn small secondary" data-advance="${c.id}">Log Today's Day (+10 XP)</button>
+          <button class="btn small ghost" data-pause="${c.id}">Pause / Reset</button>`}
+      </div>
+    </div>`;
+  }).join('');
+  host.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{
+    state.challenges[b.dataset.start] = {day:0, startDate:todayStr()};
+    saveState(); checkAchievements(); renderChallenges();
+    toast('Challenge started — you can do this!','🏁');
+  });
+  host.querySelectorAll('[data-advance]').forEach(b=>b.onclick=()=>{
+    const id = b.dataset.advance;
+    const def = CHALLENGE_DEFS.find(c=>c.id===id);
+    state.challenges[id].day = Math.min(def.total, state.challenges[id].day+1);
+    saveState();
+    addXP(10, `${def.name} — day logged`);
+    touchStreak();
+    if(state.challenges[id].day >= def.total) toast(`🎉 ${def.name} complete!`, '🏆');
+    renderChallenges();
+  });
+  host.querySelectorAll('[data-pause]').forEach(b=>b.onclick=()=>{
+    delete state.challenges[b.dataset.pause];
+    saveState(); renderChallenges();
+  });
+}
+
+/* ---------- CHARACTERS ---------- */
+function renderCharacters(){
+  const host = document.getElementById('charList');
+  host.innerHTML = CHARACTERS.map((c,i)=>`
+    <div class="char-card" data-i="${i}">
+      <h3>👤 ${c.name}</h3>
+      <p class="muted">${c.story}</p>
+      <div class="char-detail">
+        <p><b>Key events:</b> ${c.events}</p>
+        <p><b>Lessons:</b> ${c.lessons}</p>
+        <p><b>Related verses:</b> ${c.verses}</p>
+      </div>
+    </div>`).join('');
+  host.querySelectorAll('.char-card').forEach(el=>{
+    el.addEventListener('click', ()=>el.classList.toggle('open'));
+  });
+}
+
+/* ---------- TIMELINE ---------- */
+function renderTimeline(){
+  document.getElementById('timelineList').innerHTML = TIMELINE.map(t=>`
+    <div class="tl-item"><b>${t.era}</b><p class="muted">${t.detail}</p></div>
+  `).join('');
+}
+
+/* ---------- ADVENTURE BUTTON ---------- */
+document.getElementById('adventureBtn').addEventListener('click', ()=>{
+  const pick = ADVENTURE_TOPICS[Math.floor(Math.random()*ADVENTURE_TOPICS.length)];
+  document.getElementById('adventureBox').innerHTML = `
+    <div class="glyph">🧭</div>
+    <h3>${pick.topic}</h3>
+    <p class="muted">Read: <b>${pick.read}</b></p>
+    <p class="muted" style="margin-top:6px;">Reflection: "${pick.reflect}"</p>
+    <button class="btn secondary small" style="margin-top:10px;" id="adventureBtn2">🎲 Another Adventure</button>
+  `;
+  document.getElementById('adventureBtn2').addEventListener('click', ()=>document.getElementById('adventureBtn')?.click());
+  addXP(5, 'Adventure discovered');
+});
+// re-bind after regeneration since button is replaced
+document.getElementById('tab-home').addEventListener('click', e=>{
+  if(e.target.id==='adventureBtn2'){
+    document.getElementById('adventureBox').innerHTML = `<button class="btn" id="adventureBtn">🎲 Surprise Me</button>`;
+    document.getElementById('adventureBtn').click();
+  }
+});
+
+/* ---------- FOCUS MODE ---------- */
+let focusInterval = null;
+function startFocus(minutes){
+  document.getElementById('focusOverlay').classList.add('active');
+  const verses = ["Be still, and know that I am God. — Psalm 46:10","The LORD is my shepherd; I shall not want. — Psalm 23:1","I can do all things through Christ which strengtheneth me. — Philippians 4:13"];
+  document.getElementById('focusVerseText').textContent = verses[Math.floor(Math.random()*verses.length)];
+  let remaining = minutes*60;
+  updateFocusDisplay(remaining);
+  clearInterval(focusInterval);
+  focusInterval = setInterval(()=>{
+    remaining--;
+    updateFocusDisplay(remaining);
+    if(remaining<=0){
+      clearInterval(focusInterval);
+      addXP(minutes, `Focus session (${minutes} min)`);
+      toast('Focus session complete','🕊️');
+      document.getElementById('focusOverlay').classList.remove('active');
+    }
+  },1000);
+}
+function startFocusCustom(){
+  const val = prompt('Minutes for your focus session:', '10');
+  const n = parseInt(val,10);
+  if(n>0) startFocus(n);
+}
+function updateFocusDisplay(sec){
+  const m = String(Math.floor(sec/60)).padStart(2,'0');
+  const s = String(sec%60).padStart(2,'0');
+  document.getElementById('focusTimerDisplay').textContent = `${m}:${s}`;
+}
+document.getElementById('exitFocusBtn').addEventListener('click', ()=>{
+  clearInterval(focusInterval);
+  document.getElementById('focusOverlay').classList.remove('active');
+});
+
+/* ---------- BIBLE LIBRARY DOWNLOAD MANAGER ---------- */
+const TOTAL_CHAPTERS = BOOK_META.reduce((s,b)=>s+b.chapters,0); // 1189
+let libDownloadActive = false;
+let libPaused = false;
+
+function renderLibraryPanel(){
+  document.getElementById('libCachedCount').textContent = cachedChapterCount();
+  document.getElementById('libTotalCount').textContent = TOTAL_CHAPTERS;
+  document.getElementById('libSizeKB').textContent = cacheSizeMB();
+  document.getElementById('libProgressBar').style.width = Math.round((cachedChapterCount()/TOTAL_CHAPTERS)*100)+'%';
+  const bookOpt = document.getElementById('libScopeBookOpt');
+  if(bookOpt) bookOpt.textContent = `Current book only (${currentBook})`;
+  if(!libDownloadActive) document.getElementById('libStatus').textContent = 'Not downloading.';
+}
+
+function buildDownloadList(scope){
+  let books = BOOK_META;
+  if(scope==='OT') books = BOOK_META.filter(b=>b.testament==='OT');
+  else if(scope==='NT') books = BOOK_META.filter(b=>b.testament==='NT');
+  else if(scope==='book') books = BOOK_META.filter(b=>b.name===currentBook);
+  const list = [];
+  books.forEach(b=>{
+    for(let c=1;c<=b.chapters;c++){
+      if(!getCachedChapter(b.name,c)) list.push({book:b.name, chap:c});
+    }
+  });
+  return list;
+}
+
+document.getElementById('libDownloadBtn').addEventListener('click', ()=>{
+  if(!navigator.onLine){ toast('No internet connection right now','📡'); return; }
+  const scope = document.getElementById('libScopeSelect').value;
+  const list = buildDownloadList(scope);
+  if(!list.length){ toast('Already fully downloaded for that scope','✅'); return; }
+  libDownloadActive = true; libPaused = false;
+  document.getElementById('libPauseBtn').style.display = 'inline-flex';
+  document.getElementById('libPauseBtn').textContent = '⏸ Pause';
+  let done = 0;
+  const total = list.length;
+  document.getElementById('libStatus').textContent = `Downloading… 0 / ${total}`;
+  const runNext = ()=>{
+    if(libPaused || !list.length){
+      libDownloadActive = false;
+      document.getElementById('libPauseBtn').style.display = 'none';
+      document.getElementById('libStatus').textContent = list.length ? 'Paused.' : 'Download complete!';
+      if(!list.length) toast('Bible Library download complete','📚');
+      return;
+    }
+    const item = list.shift();
+    queueFetchChapter(item.book, item.chap).catch(()=>{}).finally(()=>{
+      done++;
+      document.getElementById('libStatus').textContent = `Downloading ${item.book} ${item.chap}… ${done} / ${total}`;
+      document.getElementById('libCachedCount').textContent = cachedChapterCount();
+      document.getElementById('libSizeKB').textContent = cacheSizeMB();
+      document.getElementById('libProgressBar').style.width = Math.round((cachedChapterCount()/TOTAL_CHAPTERS)*100)+'%';
+      runNext();
+    });
+  };
+  runNext();
+});
+document.getElementById('libPauseBtn').addEventListener('click', ()=>{
+  libPaused = true;
+  document.getElementById('libPauseBtn').textContent = 'Pausing…';
+});
+document.getElementById('libClearBtn').addEventListener('click', ()=>{
+  if(confirm('This deletes every downloaded chapter from this device (your notes, bookmarks, and journal are untouched). Continue?')){
+    clearBibleCache();
+    renderLibraryPanel();
+    toast('Cached chapters cleared','🗑');
+  }
+});
+
+/* ---------- THEMES ---------- */
+const THEMES = [
+  {id:'parchment', label:'Ancient Scroll', emoji:'📜'},
+  {id:'night', label:'Night Reflection', emoji:'🌙'},
+  {id:'sunrise', label:'Sunrise', emoji:'🌅'},
+  {id:'scroll', label:'Old Parchment', emoji:'📖'},
+  {id:'nature', label:'Nature Peace', emoji:'🌿'}
+];
+function renderThemes(){
+  const row = document.getElementById('themeRow');
+  row.innerHTML = THEMES.map(t=>`
+    <div class="theme-swatch ${state.theme===t.id?'active':''}" data-theme-id="${t.id}">
+      <div class="theme-preview ${t.id}"></div>
+      <span style="font-size:11.5px;">${t.emoji} ${t.label}</span>
+    </div>`).join('');
+  row.querySelectorAll('.theme-swatch').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      state.theme = el.dataset.themeId;
+      document.body.setAttribute('data-theme', state.theme);
+      saveState();
+      renderThemes();
+    });
+  });
+}
+document.getElementById('exportDataBtn').addEventListener('click', ()=>{
+  downloadText('scripture-quest-data.json', JSON.stringify(state, null, 2));
+});
+document.getElementById('resetDataBtn').addEventListener('click', ()=>{
+  if(confirm('This will permanently erase all your progress in this browser. Continue?')){
+    localStorage.removeItem('scriptureQuestState');
+    state = loadState();
+    document.body.setAttribute('data-theme', state.theme);
+    initAll();
+    toast('Progress reset','🔄');
+  }
+});
+
+/* ---------- INIT ---------- */
+function initAll(){
+  document.body.setAttribute('data-theme', state.theme || 'parchment');
+  populateBookSelect();
+  renderChapter();
+  renderHeader();
+  renderMissions();
+  touchStreak();
+  renderHeader();
+  renderMissions();
+  renderLibraryPanel();
+  renderReviewQueue();
+}
+loadCacheFromDisk().finally(initAll);
+</script>
+</body>
+</html>
